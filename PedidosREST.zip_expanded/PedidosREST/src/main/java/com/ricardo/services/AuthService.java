@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -25,7 +24,6 @@ import com.netmind.DAO.DAOFactory;
 import com.netmind.DAO.UsuarioDAO;
 import com.ricardo.models.StatusMessage;
 import com.ricardo.models.Usuario;
-
 
 @Path("/authenticate")
 public class AuthService extends JSONService{
@@ -79,7 +77,7 @@ public class AuthService extends JSONService{
 		// Create the Claims, which will be the content of the JWT
 		JwtClaims claims = new JwtClaims();
 		claims.setIssuer("netmind.com"); // who creates the token and signs it
-		claims.setExpirationTimeMinutesInTheFuture(30); // token will expire (10
+		claims.setExpirationTimeMinutesInTheFuture(50); // token will expire (10
 														// minutes from now)
 		claims.setGeneratedJwtId(); // a unique identifier for the token
 		claims.setIssuedAtToNow(); // when the token was issued/created (now)

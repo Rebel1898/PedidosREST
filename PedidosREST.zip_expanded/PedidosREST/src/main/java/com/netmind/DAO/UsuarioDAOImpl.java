@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import com.ricardo.models.Usuario;
-
 
 public class UsuarioDAOImpl extends UsuarioDAO{
 	

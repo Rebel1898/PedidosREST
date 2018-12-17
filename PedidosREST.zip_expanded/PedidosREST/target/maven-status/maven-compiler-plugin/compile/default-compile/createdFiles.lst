@@ -1,0 +1,12 @@
+com\ricardo\models\Usuario.class
+com\netmind\DAO\UsuarioDAOImpl.class
+com\ricardo\services\JSONService.class
+com\ricardo\services\AuthService.class
+com\netmind\DAO\UsuarioDAO.class
+com\ricardo\services\PedidosService.class
+com\netmind\DAO\DAO.class
+com\ricardo\models\Pedido.class
+com\ricardo\persistence\PedidosManager.class
+com\netmind\DAO\DAOFactory.class
+com\ricardo\models\StatusMessage.class
+com\ricardo\filters\TokenFilter.class

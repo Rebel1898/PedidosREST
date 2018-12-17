@@ -14,15 +14,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import com.ricardo.models.Pedido;
 import com.ricardo.models.StatusMessage;
-import com.ricardo.models.Usuario;
-import com.ricardo.services.JSONService;
+import com.ricardo.persistence.PedidosManager;
 
 @Path("/pedidos")
-public class PedidosService extends JSONService {
+public class PedidosService {
 
 	private static final List<Pedido> pedidos = new ArrayList<Pedido>();
 
@@ -34,157 +34,91 @@ public class PedidosService extends JSONService {
 		pedidos.add(new Pedido(5, "Producto 5", 27));
 	}
 
-	private static List<Usuario> misUsuarios;
-
-	static {
-		misUsuarios = new ArrayList<Usuario>();
-
-		misUsuarios.add(new Usuario(1, "Ric", "AG", "r@e.es"));
-		misUsuarios.add(new Usuario(2, "Juana", "Juanasson", "j@e.es"));
-		misUsuarios.add(new Usuario(3, "Pepa", "Pepasson", "p@e.es"));
-	}
-
 	@GET
 	@Produces("application/json")
-	 //List<Pedido>
-	public Response getPedido(@HeaderParam("token") String token) {
-		String userEmail = this.getUserEmailFromToken(token);
-		Response mResponse=null;
-	
-		if (userEmail == null) {
-			StatusMessage statusMessage = new StatusMessage(Status.FORBIDDEN.getStatusCode(),"Access Denied for this functionality !!!");
-			mResponse=Response.status(Status.FORBIDDEN.getStatusCode()).entity(statusMessage).build();
-		}else { mResponse=Response.status(200).entity(pedidos).build();
-		
-	
+	public Response getPedidos() {
 
-		}
-		
-	return mResponse;
+		PedidosManager pm = PedidosManager.getInstance();
+
+		return Response.status(200).entity(pm.getPedidos()).build();
 	}
 
-	@Path("/{pid}")
+	@Path("/{id}")
 	@GET
 	@Produces("application/json")
-
-	public Response getPedido(@PathParam("pid") int pid, @HeaderParam("token") String token) {
-		String userEmail = this.getUserEmailFromToken(token);
-		Response mResponse=null;
-		Response resp= null;
-
-		if(userEmail!=null)
-		{
-
+	public Response getPedido(@PathParam("id") int pid) {
+		Response resp = null;
 		Pedido pedidoRet = null;
 
 		for (Pedido pedido : pedidos) {
-
 			if (pedido.getPid() == pid) {
-
 				pedidoRet = pedido;
 				break;
 			}
 		}
-		
-		
-		if(pedidoRet==null)
-		{	resp=Response.status(404).entity(new StatusMessage(404,"El pedido no existe")).build();}
 
-	
-	else {resp=Response.status(200).entity(pedidoRet).build();}
-		return resp;
+		if (pedidoRet == null) {
+			resp = Response.status(404).entity(new StatusMessage(404, "El pedido no existe")).build();
+		} else {
+			resp = Response.status(200).entity(pedidoRet).build();
 		}
-		
-		
-		
-		else {resp=Response.status(403).entity(new StatusMessage(403,"Necesitas permisos")).build();
-	}
-		return resp;}
 
-	
+		return resp;
+	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPedido(Pedido pedidoNuevo,@HeaderParam("token") String token) {
-		Response resp=null;
-		if(token!=null) {
-		pedidoNuevo.setPid(pedidos.size() + 1);
-		pedidos.add(pedidoNuevo);
-	    System.out.println(token);
-		
-		if(!(pedidoNuevo instanceof Pedido))
-		{	resp=Response.status(404).entity(new StatusMessage(404,"El pedido no existe")).build();}
+	public Response addPedido(Pedido pedidoNuevo) {
+		Response resp = null;
 
-	
-		else {resp=Response.status(200).entity(new StatusMessage(200,"Pedido creado"+pedidoNuevo)).build();}
+		if (pedidoNuevo.validate()) {
+			pedidoNuevo.setPid(pedidos.size() + 1);
+			pedidos.add(pedidoNuevo);
+			resp = Response.status(200).entity(pedidoNuevo).build();
+		} else {
+			resp = Response.status(400).entity(new StatusMessage(400, "Pedido incompleto")).build();
+		}
+
 		return resp;
-		}
-		else {
-			resp=Response.status(403).entity(new StatusMessage(403,"Necesitas permisos")).build();	
-		}
-		return resp;
-
-		}
-		
-
-		
-		
-		
-		
-		
-	
-
-	@Path("/{pid}")
-	@DELETE
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-
-	public boolean deletepedido(@PathParam("pid") int pid) {
-		boolean ok = false;
-
-		for (Pedido pedido : pedidos) {
-
-			if (pedido.getPid() == pid) {
-				ok = true;
-				pedidos.remove(pedido);
-				break;
-			}
-		}
-
-		return ok;
-
 	}
 	
 	
+
 	
-	@Path("/{pid}")
+	
+	@Path("/{id}")
+	@DELETE
+	@Produces("application/json")
+	public ResponseBuilder deletePedido(@PathParam("id") int pid) {
+		PedidosManager pm = PedidosManager.getInstance();
+		if(pid>0) {
+			try {
+		return Response.status(200).entity(PedidosManager.getInstance().deletepedido(pid));
+			}
+		catch(Exception e) {System.out.println("Todo mal");}
+		}
+		return Response.status(200).entity(new StatusMessage(404,"No existe"));
+
+	}
+
+	@Path("/{id}")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-
-	public boolean actualizapedido(@PathParam("pid") int pid, Pedido unpedido) {
-		boolean ok = false;
+	public boolean actualizarPedido(@PathParam("id") int pid, Pedido unPedido) {
+		boolean OK = false;
 
 		for (Pedido pedido : pedidos) {
-
 			if (pedido.getPid() == pid) {
-				ok = true;
 				pedidos.remove(pedido);
-				pedidos.add(unpedido);
-
+				pedidos.add(unPedido);
+				OK = true;
 				break;
 			}
 		}
 
-		return ok;
-
+		return OK;
 	}
-	
-	
-	
-	
-	
-	
-	
 
 }

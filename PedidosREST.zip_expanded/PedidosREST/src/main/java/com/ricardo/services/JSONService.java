@@ -26,8 +26,6 @@ import com.netmind.DAO.UsuarioDAO;
 import com.ricardo.models.StatusMessage;
 import com.ricardo.models.Usuario;
 
-
-
 @Path("/json")
 public class JSONService {
 	private static Logger logger = Logger.getLogger("JSONService");
@@ -51,39 +49,8 @@ public class JSONService {
 
 	}
 
-	@GET
-	@Path("/owndata")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getOwnData(@HeaderParam("token") String token) {
-		logger.log(Level.INFO, "token:" + token);
-		String userEmail = "";
-
-		userEmail = this.getUserEmailFromToken(token);
-
-		if (userEmail == null) {
-			StatusMessage statusMessage = new StatusMessage();
-			statusMessage.setStatus(Status.FORBIDDEN.getStatusCode());
-			statusMessage.setMessage("Access Denied for this functionality !!!");
-			return Response.status(Status.FORBIDDEN.getStatusCode()).entity(statusMessage).build();
-		}
-
-		Usuario user = null;
-		UsuarioDAO userDAO;
-		int uid = 0;
-
-		try {
-			userDAO = (UsuarioDAO) DAOFactory.getDao("usuario");
-			user = userDAO.getUsuarioByMail(userEmail);
-			uid = user.getUid();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return Response.status(200).entity(user).build();
-	}
-
 	/* AUX */
-	protected String getUserEmailFromToken(String token) {
+	public static String getUserEmailFromToken(String token) {
 		if (token == null)
 			return null;
 
@@ -103,10 +70,8 @@ public class JSONService {
 			// Validate the JWT and process it to the Claims
 			JwtClaims jwtClaims = jwtConsumer.processToClaims(token);
 			logger.log(Level.INFO, "JWT validation succeeded! " + jwtClaims.getSubject().toString());
-			System.out.println("PENULTIMO"+jwtClaims.getSubject().toString());
 			userEmail = jwtClaims.getSubject().toString();
-			System.out.println("FINAL"+userEmail);		
-} catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
