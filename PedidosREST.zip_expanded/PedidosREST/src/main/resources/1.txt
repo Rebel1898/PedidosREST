@@ -1,1 +1,1 @@
-1.0 https://github.com/Rebel1898/PedidosREST/blob/master/PedidosREST.zip_expanded/PedidosREST/src/main/resources/new-version.zip?raw=true a8ec3818db1436047f3ef679c64ce4d34fd9160d
+1.0 https://github.com/Rebel1898/PedidosREST/blob/master/PedidosREST.zip_expanded/PedidosREST/src/main/resources/new-version.zip?raw=true 9ccc18d3a42e2e0c8a15ed0afee0126774c5cef0
